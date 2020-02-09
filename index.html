@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Text extractor and word finder for English, Telugu and Urdu</title>
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css'>
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/css/dropify.min.css'>
+<link href="https://fonts.googleapis.com/css?family=Courgette&display=swap" rel="stylesheet">
+ <link href="https://fonts.googleapis.com/css?family=Neucha&display=swap" rel="stylesheet"> 
+ <link href="https://fonts.googleapis.com/css?family=Changa+One&display=swap" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Zhi+Mang+Xing&display=swap" rel="stylesheet"> 
+<style>
+.dropify-font-upload:before, .dropify-wrapper .dropify-message span.file-icon:before {
+    content: '\e800';
+}
+.dropify-font:before, .dropify-wrapper .dropify-message span.file-icon:before, .dropify-wrapper .dropify-preview .dropify-infos .dropify-infos-inner p.dropify-filename span.file-icon:before, [class*=" dropify-font-"]:before, [class^=dropify-font-]:before {
+    font-family: dropify;
+    font-style: normal;
+    font-weight: 550;
+    speak: none;
+    display: inline-block;
+    text-decoration: inherit;
+    width: 1em;
+    margin-left: .2em;
+    margin-right: .2em;
+    text-align: center;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1em;
+    font-size:8rem;
+}
+</style>
+</head>
+<body>
+ <nav class="lime darken-1">
+    <div class="nav-wrapper">
+      <div style="margin-left:8%;margin-right:6%">
+<a href="index.html" class="brand-logo"><img src="sih.png" style="width:69px; height:60px">
+<span style="font-family: 'Zhi Mang Xing', cursive;vertical-align: top;color:white">Smart India Hackathon</span></a>
+      <ul id="nav-mobile" class="right hide-on-med-and-down">
+        <li><a href="#how_to" style="font-size:1.4rem;font-family: 'Times New Roman';">How to Use</a></li>
+        <li><a href="#features" style="font-size:1.4rem;font-family: 'Times New Roman';">Features</a></li>
+      </ul>
+</div>
+    </div>
+  </nav>
+<section>
+<div class="row">
+<div class="col l7 offset-l1 m8 s12" style="margin-top:4%">
+<div class="card-panel hoverable z-depth-1" style="padding:0px">
+<form action="" class="row">
+    <input id="file-input" type="file" class="dropify" data-default-file="" data-height="300" data-max-file-size="50M" data-allowed-file-extensions="pdf png jpeg jpg">
+</form>
+</div>
+<div class="col l12 m12 s12">
+  <div class="card-panel" id="output-box" style="display: none;">
+    <h4 class='center lime-text text-darken-1' style="font-family:'Changa One', cursive;">Output</h4>
+    <div class="input-field">
+      <i class="material-icons prefix">search</i>
+      <input class="search-input" id="search" type="text" placeholder="Search for Words..." autocomplete="off">
+    </div>
+    <div id="output" class="content">
+    </div>
+  </div>
+</div>
+</div>
+<div class="col l3 m4 s12" style="margin-top:4%;">
+<div class="card-panel" id="log-data" style="display:none;font-family: 'Arapey', serif;">
+<h4 class="center lime-text text-darken-4" style="font-family: 'Neucha', cursive;">Progress</h4>
+</div>
+</div>
+</section>
+<section>
+<div class="row" style="margin-left:2%; margin-right:2%">
+<div class="col l6 m6 s12">
+<div class="card-panel">
+<h4 style="font-family: 'Changa One', cursive;" id="how_to">How to use?</h4>
+<p class="flow-text">1. Click on the above file upload box and choose the file you want to extract texts from.</p>
+<p class="flow-text">2. Wait till the model does its work of extracting texts, you can see the progress in right side.</p>
+<p class="flow-text">3. Once the output is ready it will be available below the file upload box.</p>
+</div>
+</div>
+<div class="col l6 m6 s12">
+<div class="card-panel">
+<h4 style="font-family: 'Changa One', cursive;" id="features">Features</h4>
+<div class="center"><i class="material-icons medium blue-text">backup</i>&nbsp;&nbsp; <i class="material-icons medium green-text">language</i>&nbsp;&nbsp; <i class="material-icons medium blue-grey-text">tablet_android</i> </div>
+<p class="flow-text">1. Large PDF file upto 500 pages are supported.</p>
+<p class="flow-text">2. Multiple language support.</p>
+<p class="flow-text">3. Mobile responsive.</p>
+<p class="flow-text">4. Search and Highlight</p>
+</div>
+</div>
+</div>
+</section>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.min.js'></script>
+<script  src="./script.js"></script>
+<script src="./tesseract/tesseract.min.js"></script>
+<script src="./search.js"></script>
+<script>
+let log_data=document.getElementById("log-data")
+let output=document.getElementById("output")
+let output_box=document.getElementById("output-box")
+function init(e)
+{
+  if (this.files && this.files[0]) {
+    var reader = new FileReader();
+    
+    reader.onload = function(e) {
+      img=e.target.result
+    }
+    
+    reader.readAsDataURL(this.files[0]);
+  }
+  count=0;
+  output.innerHTML=''
+  output_box.style.display="none"
+  output.style.display="none"
+  img_name=this.files[0].name
+log_data.innerHTML=`<h4 class='center lime-text text-darken-4' style="font-family: 'Neucha', cursive;">Progress</h4>`
+const { createWorker } = Tesseract;
+    const worker = createWorker({
+      workerPath: './tesseract/worker.min.js',
+      langPath: '../lang-data',
+      corePath: './tesseract/tesseract-core.wasm.js',
+      logger: m => {
+        count=count+1
+log_data.style.display="block"
+log_data.innerHTML+="<span class='grey-text'>Progress "+Math.round(m.progress*100,0)+"%</span> : <span class='red-text'>"+m.status+"...</span><br>"
+if(count>7)
+{
+  log_data.innerHTML=`<h4 class='center lime-text text-darken-4' style="font-family: 'Neucha', cursive;">Progress</h4>`
+  count=0
+}
+},
+    });
+
+    (async () => {
+      await worker.load();
+      await worker.loadLanguage('eng+urd+tel+tha');
+      await worker.initialize('eng+urd+tel+tha');
+      const { data: { text } } = await worker.recognize(img);
+      output_box.style.display="block"
+      output.style.display="block"
+      output.innerHTML+=text
+      log_data.innerHTML+="<b class='green-text'>Text extracted successfully...</b>"
+      console.log(text);
+      await worker.terminate();
+      setup();
+    })();
+}
+let file_input=document.getElementById("file-input")
+file_input.addEventListener("change",init)
+</script>
+</body>
+</html>
